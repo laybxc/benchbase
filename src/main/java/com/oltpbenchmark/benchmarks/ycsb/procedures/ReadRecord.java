@@ -17,7 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.ycsb.procedures;
 
-import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME;
+import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME_READ;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
@@ -28,7 +28,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ReadRecord extends Procedure {
-  public final SQLStmt readStmt = new SQLStmt("SELECT * FROM " + TABLE_NAME + " WHERE YCSB_KEY=?");
+  public final SQLStmt readStmt =
+      new SQLStmt("SELECT * FROM " + TABLE_NAME_READ + " WHERE YCSB_KEY=?");
 
   // FIXME: The value in ysqb is a byteiterator
   public void run(Connection conn, int keyname, String[] results) throws SQLException {

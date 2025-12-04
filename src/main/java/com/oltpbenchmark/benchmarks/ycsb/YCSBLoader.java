@@ -62,21 +62,37 @@ class YCSBLoader extends Loader<YCSBBenchmark> {
   }
 
   private void loadRecords(Connection conn, int start, int stop) throws SQLException {
-    Table catalog_tbl = benchmark.getCatalog().getTable("USERTABLE");
+    // 获取两个表的元数据（假设它们结构相同）
+    Table catalogTblR = benchmark.getCatalog().getTable("usertable_r");
+    Table catalogTblW = benchmark.getCatalog().getTable("usertable_w");
 
-    String sql = SQLUtil.getInsertSQL(catalog_tbl, this.getDatabaseType());
-    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    String sqlR = SQLUtil.getInsertSQL(catalogTblR, this.getDatabaseType());
+    String sqlW = SQLUtil.getInsertSQL(catalogTblW, this.getDatabaseType());
+
+    try (PreparedStatement stmtR = conn.prepareStatement(sqlR);
+        PreparedStatement stmtW = conn.prepareStatement(sqlW)) {
+
       long total = 0;
       int batch = 0;
+
       for (int i = start; i < stop; i++) {
-        stmt.setInt(1, i);
+        // 为两个表设置相同的参数
+        stmtR.setInt(1, i);
+        stmtW.setInt(1, i);
+
         for (int j = 0; j < YCSBConstants.NUM_FIELDS; j++) {
-          stmt.setString(j + 2, TextGenerator.randomStr(rng(), benchmark.fieldSize));
+          String fieldValue = TextGenerator.randomStr(rng(), benchmark.fieldSize);
+          stmtR.setString(j + 2, fieldValue);
+          stmtW.setString(j + 2, fieldValue);
         }
-        stmt.addBatch();
+
+        stmtR.addBatch();
+        stmtW.addBatch();
+
         total++;
         if (++batch >= workConf.getBatchSize()) {
-          stmt.executeBatch();
+          stmtR.executeBatch();
+          stmtW.executeBatch();
 
           batch = 0;
           if (LOG.isDebugEnabled()) {
@@ -84,15 +100,19 @@ class YCSBLoader extends Loader<YCSBBenchmark> {
           }
         }
       }
+
+      // 处理剩余批次
       if (batch > 0) {
-        stmt.executeBatch();
+        stmtR.executeBatch();
+        stmtW.executeBatch();
         if (LOG.isDebugEnabled()) {
           LOG.debug(String.format("Records Loaded %d / %d", total, this.num_record));
         }
       }
     }
+
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Finished loading {}", catalog_tbl.getName());
+      LOG.debug("Finished loading usertable_r and usertable_w");
     }
   }
 }

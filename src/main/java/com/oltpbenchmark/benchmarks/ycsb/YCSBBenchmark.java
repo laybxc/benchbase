@@ -71,8 +71,8 @@ public final class YCSBBenchmark extends BenchmarkModule {
     List<Worker<? extends BenchmarkModule>> workers = new ArrayList<>();
     try {
       // LOADING FROM THE DATABASE IMPORTANT INFORMATION
-      // LIST OF USERS
-      Table t = this.getCatalog().getTable("USERTABLE");
+      // LIST OF USERS change!!!
+      Table t = this.getCatalog().getTable("usertable_r");
       String userCount = SQLUtil.getMaxColSQL(this.workConf.getDatabaseType(), t, "ycsb_key");
 
       try (Connection metaConn = this.makeConnection();

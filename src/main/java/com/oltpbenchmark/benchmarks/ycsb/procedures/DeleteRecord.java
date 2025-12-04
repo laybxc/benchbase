@@ -17,7 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.ycsb.procedures;
 
-import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME;
+import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME_WRITE;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
@@ -26,7 +26,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DeleteRecord extends Procedure {
-  public final SQLStmt deleteStmt = new SQLStmt("DELETE FROM " + TABLE_NAME + " where YCSB_KEY=?");
+  public final SQLStmt deleteStmt =
+      new SQLStmt("DELETE FROM " + TABLE_NAME_WRITE + " where YCSB_KEY=?");
 
   // FIXME: The value in ysqb is a byteiterator
   public void run(Connection conn, int keyname) throws SQLException {

@@ -17,7 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.ycsb.procedures;
 
-import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME;
+import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME_READ;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
@@ -29,11 +29,11 @@ import java.sql.SQLException;
 
 public class ReadModifyWriteRecord extends Procedure {
   public final SQLStmt selectStmt =
-      new SQLStmt("SELECT * FROM " + TABLE_NAME + " where YCSB_KEY=? FOR UPDATE");
+      new SQLStmt("SELECT * FROM " + TABLE_NAME_READ + " where YCSB_KEY=? FOR UPDATE");
   public final SQLStmt updateAllStmt =
       new SQLStmt(
           "UPDATE "
-              + TABLE_NAME
+              + TABLE_NAME_READ
               + " SET FIELD1=?,FIELD2=?,FIELD3=?,FIELD4=?,FIELD5=?,"
               + "FIELD6=?,FIELD7=?,FIELD8=?,FIELD9=?,FIELD10=? WHERE YCSB_KEY=?");
 

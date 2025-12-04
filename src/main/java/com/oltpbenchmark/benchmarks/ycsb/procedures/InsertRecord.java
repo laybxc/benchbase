@@ -17,7 +17,7 @@
 
 package com.oltpbenchmark.benchmarks.ycsb.procedures;
 
-import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME;
+import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME_WRITE;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
@@ -27,7 +27,7 @@ import java.sql.SQLException;
 
 public class InsertRecord extends Procedure {
   public final SQLStmt insertStmt =
-      new SQLStmt("INSERT INTO " + TABLE_NAME + " VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+      new SQLStmt("INSERT INTO " + TABLE_NAME_WRITE + " VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 
   // FIXME: The value in ysqb is a byteiterator
   public void run(Connection conn, int keyname, String[] vals) throws SQLException {
