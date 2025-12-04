@@ -157,6 +157,64 @@ public class WorkloadState {
     }
   }
 
+  /** Called by ThreadPoolThreads when waiting for work. */
+  public SubmittedProcedure fetchWork(int workerId) {
+    synchronized (this) {
+      if (currentPhase != null && currentPhase.isSerial()) {
+        ++workersWaiting;
+        while (getGlobalState() == State.LATENCY_COMPLETE) {
+          try {
+            this.wait();
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        --workersWaiting;
+
+        if (getGlobalState() == State.EXIT || getGlobalState() == State.DONE) {
+          return null;
+        }
+
+        ++workersWorking;
+        return new SubmittedProcedure(
+          currentPhase.chooseTransaction(workerId, num_terminals));
+      }
+    }
+
+    // Unlimited-rate phases don't use the work queue.
+    if (currentPhase != null && !currentPhase.isRateLimited()) {
+      synchronized (this) {
+        ++workersWorking;
+      }
+      return new SubmittedProcedure(
+        currentPhase.chooseTransaction(workerId, num_terminals));
+    }
+
+    synchronized (this) {
+      // Sleep until work is available.
+      if (workQueue.peek() == null) {
+        workersWaiting += 1;
+        while (workQueue.peek() == null) {
+          if (this.benchmarkState.getState() == State.EXIT
+            || this.benchmarkState.getState() == State.DONE) {
+            return null;
+          }
+
+          try {
+            this.wait();
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        workersWaiting -= 1;
+      }
+
+      ++workersWorking;
+
+      return workQueue.remove();
+    }
+  }
+
   public void finishedWork() {
     synchronized (this) {
       --workersWorking;

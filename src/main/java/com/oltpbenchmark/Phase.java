@@ -203,6 +203,28 @@ public class Phase {
     return -1;
   }
 
+  public int chooseTransaction(int workerId, int totalWorkers) {
+    if (isDisabled()) {
+      return -1;
+    }
+
+    // based on the workerId, all workers evenly split the total weight
+    double weightPerTerminal = totalWeight() / totalWorkers;
+    int lowerWeight = (int) (workerId * weightPerTerminal);
+    int upperWeight = (int) ((workerId + 1) * weightPerTerminal);
+    int randomPercentage = gen.nextInt(upperWeight - lowerWeight) + lowerWeight + 1;
+
+    double weight = 0.0;
+    for (int i = 0; i < this.weightCount; i++) {
+      weight += weights.get(i);
+      if (randomPercentage <= weight) {
+        return i + 1;
+      }
+    }
+
+    return -1;
+  }
+
   /** Returns a string for logging purposes when entering the phase */
   public String currentPhaseString() {
     List<String> inner = new ArrayList<>();
